@@ -20,9 +20,22 @@ class ColumnFilter(object):
                 self.tableWidget.item(rowcount,itemcount).setFlags(QtCore.Qt.ItemIsSelectable)
                 itemcount = itemcount+1
             self.tableWidget.setItem(rowcount,itemcount,QtWidgets.QTableWidgetItem(""))
+            #combobox at 4th row 
+            self.comboBox = QtWidgets.QComboBox()
+            comboitems = obj.UniqueValues(row["Column Name"],info)
+            self.comboBox.addItem("-select-")
+            self.comboBox.addItems(comboitems)
+            self.tableWidget.setCellWidget(rowcount, itemcount, self.comboBox)
             self.tableWidget.item(rowcount,itemcount).setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsUserCheckable)
+            self.dict[row["Column Name"]] = self.comboBox
             rowcount=rowcount+1 
         self.tableWidget.itemDoubleClicked.connect(obj.SelectQuery)
+
+    def Text(self):
+        pass
+    
+    def Display(self):
+        pass
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -46,6 +59,7 @@ class ColumnFilter(object):
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
 
+        self.dict = {}
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 

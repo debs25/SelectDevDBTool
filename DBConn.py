@@ -12,7 +12,7 @@ class DB:
 
     def Connect(self):
         self.con = cx_Oracle.connect(user=self.user, password=self.password, dsn=self.constring)
-        print(self.con.version)
+        #print(self.con.version)
         self.cursor = self.con.cursor()
 
     def Version(self):
@@ -43,7 +43,7 @@ class DB:
         return res
 
     def TablesWithColumnName(self, owner:str, search:str)->[str]:
-        print(search)
+        # print(search)
         def innerfunc(owner:str,colname:str)-> List[str]:
             tbquery = '''select table_name from all_tab_columns where upper(owner)=upper(:1) and upper(column_name) = upper(:2) and TABLE_NAME not like 'KEY_%' and  TABLE_NAME not like 'V_%' '''
             self.cursor = self.con.cursor()
@@ -56,6 +56,20 @@ class DB:
             res.append(name.__getitem__(0))
         return res
     
+    def GetDistValue(self, column:str, table:str)->[str]:
+        def innerfunc(owner:str,colname:str)-> List[str]:
+            query = ' select distinct '+column+' from '+table+' order by '+column+' asc '
+            
+            self.cursor = self.con.cursor()
+            self.cursor.execute(query)
+            rows = list(self.cursor.fetchall())
+            return rows
+        tableslist = innerfunc(column, table)
+        res = []
+        for name in tableslist:
+            res.append(str(name.__getitem__(0)))
+        #print(res)
+        return res
  
         
     def GetAllColumnsForTable(self, table)-> List[dict]:

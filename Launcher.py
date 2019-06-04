@@ -5,7 +5,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 import DBConn as Con 
 import TableList as tableNameList
 import ColumnFilter as columnFilter
-import quresult as resTable
+#import quresult as resTable
 
 class MainUI(object):
     isConnected = False
@@ -64,6 +64,10 @@ class MainUI(object):
     def SelectQuery(self,data):
         print(data)
         
+    def UniqueValues(self, column,table)->[str]:
+        print(column)
+        print(table)
+        return self.con.GetDistValue(column,table)
 
     def setupUi(self, DBGGUMain):
         DBGGUMain.setObjectName("DBGGUMain")
