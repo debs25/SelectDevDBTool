@@ -7,11 +7,11 @@ install cx_oracle, pyQt5.
 2. set host, port, sid, user name and password and then connect.
 3. search with a table name/ full column name(tick is column).
 4. new window with all table list will appear
-5. make as many list as you want (drag)
+5. make as many list as you want (drag any side )
 6. click table name in the list 
 7. tableview dialog will appear
 8. select any item for "Filter Data" - to enter your data 
-9. click data button to view (not imlemented)
+9. click data button to view
 10. click text to add your result in test (not implemented)
 11. copy anywhere (lets say source code) - access through clipboard (not implemented)
 12. compare results (not implemneted)
