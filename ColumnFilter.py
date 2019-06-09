@@ -21,21 +21,19 @@ class ColumnFilter(object):
                 itemcount = itemcount+1
             self.tableWidget.setItem(rowcount,itemcount,QtWidgets.QTableWidgetItem(""))
             #combobox at 4th row 
-            self.comboBox = QtWidgets.QComboBox()
+            comboBox = QtWidgets.QComboBox()
             comboitems = obj.UniqueValues(row["Column Name"],info)
-            self.comboBox.addItem("-select-")
-            self.comboBox.addItems(comboitems)
-            self.tableWidget.setCellWidget(rowcount, itemcount, self.comboBox)
-            self.tableWidget.item(rowcount,itemcount).setFlags(QtCore.Qt.ItemIsEnabled | QtCore.Qt.ItemIsEditable | QtCore.Qt.ItemIsSelectable|QtCore.Qt.ItemIsUserCheckable)
-            self.dict[row["Column Name"]] = self.comboBox
+            comboBox.addItem("-select-")
+            comboBox.addItems(comboitems)
+            self.tableWidget.setCellWidget(rowcount, itemcount, comboBox)
             rowcount=rowcount+1 
-        self.tableWidget.itemDoubleClicked.connect(obj.SelectQuery)
+                    
+        self.toolButton.clicked.connect(lambda:obj.Data(info, 'and',self.tableWidget)) #'OR' will be coming from GUI soon
+        self.toolButton_2.clicked.connect(obj.Text)
 
-    def Text(self):
-        pass
-    
-    def Display(self):
-        pass
+    def data(self,item):
+        print(item)
+ 
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
@@ -58,8 +56,7 @@ class ColumnFilter(object):
         self.tableWidget.setObjectName("tableWidget")
         self.tableWidget.setColumnCount(0)
         self.tableWidget.setRowCount(0)
-
-        self.dict = {}
+     
         self.retranslateUi(Form)
         QtCore.QMetaObject.connectSlotsByName(Form)
 

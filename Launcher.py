@@ -1,15 +1,17 @@
 # DebS 
 
 from PyQt5 import QtCore, QtGui, QtWidgets
-
+from datetime import datetime
 import DBConn as Con 
 import TableList as tableNameList
 import ColumnFilter as columnFilter
-#import quresult as resTable
+import QResult as resTable
+
+
 
 class MainUI(object):
     isConnected = False
-        
+    filterdata ={}
     def connectDB(self):
         if self.isConnected is False:
             self.con = Con.DB(self.editHost.text(),self.editPort.text(),self.editSID.text(),self.editUser.text(),self.editPassword.text())
@@ -59,14 +61,58 @@ class MainUI(object):
                 coldiag.setupdata(data,tablename,self)
                 self.descui.show()
                 self.tblDlg.append(self.descui)
-        #print(data)
-    
+            
+    def Text(self, text):
+        print('text:column filter ')
+
+    def Data(self, tablename, sqlcond, table):
+        query = 'select * from '
+        query+=tablename 
+        query+= ' '
+        rowCount = table.rowCount()
+        condlist = []
+        for row in range(rowCount):
+            colname = table.item(row, 0).text()
+            colvalue = table.cellWidget(row,3).currentText()
+            coltype  = table.item(row, 1).text()
+            if colvalue != "-select-":
+                if "VARCHAR" not in coltype: 
+                     condlist.append(" "+colname+" = "+colvalue+" ")
+                else :
+                    condlist.append(" "+colname+" = '"+colvalue+"' ")
+               # print(colname+':'+colvalue)
+        if len(condlist) > 0:
+            query += " where"
+        for i in range(len(condlist)):
+            if i > 0:
+                query+= sqlcond
+            query += condlist[i]
+            
+        #query +=" ;" #lol does not take ; wasted  day :-)
+        print(query)
+        data = self.con.Query(query)
+        print(data)
+        diag = resTable.QResultDlg()
+        self.resUI = QtWidgets.QWidget()
+        diag.setupUi(self.resUI)
+        # add data
+        diag.setupdata(data,tablename,self)
+
+        self.resUI.show()
+        self.colResUI.append(self.resUI)
+
+        
+ 
+
+    def ShowRes(self, data):
+        print(self,data)
+
     def SelectQuery(self,data):
         print(data)
         
     def UniqueValues(self, column,table)->[str]:
-        print(column)
-        print(table)
+       # print(column)
+        #print(table)
         return self.con.GetDistValue(column,table)
 
     def setupUi(self, DBGGUMain):
@@ -76,8 +122,7 @@ class MainUI(object):
         DBGGUMain.statusBar().setSizeGripEnabled(False) 
         self.colDlg = []
         self.tblDlg = []
-    
-
+        self.colResUI = []
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)

@@ -18,8 +18,8 @@ class DB:
     def Version(self):
         return self.con.version
 
-    def Query(self, query, params=None)-> List[dict]:
-        self.cursor.execute(query, params)
+    def Query(self, query)-> List[dict]:
+        self.cursor.execute(query)
         colnames = list(map(lambda x: x.lower(), [d[0] for d in self.cursor.description]))
         rows = self.cursor.fetchall()
         result = [dict(zip(colnames, row)) for row in rows]
