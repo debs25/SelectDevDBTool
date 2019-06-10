@@ -5,17 +5,18 @@ import Launcher
 
 class TableList(object):
 
-    def setupdata(self,data,info,obj):
+    def setupdata(self,data,info,obj,writer):
         for item in data:
             self.listWidget.addItem(item)
          #connection 
         self.listWidget.itemDoubleClicked.connect(obj.TableItemClicked)
         self.textBrowser.setText("Found "+str(len(data))+". "+info)
-
+        self.toolButton_2.clicked.connect(lambda:writer.CBList("Found "+str(len(data))+". "+info, data))
 
     def setupUi(self, Columns):
         Columns.setObjectName("Columns")
         Columns.resize(282, 619)
+        Columns.setFixedSize(280, 620) 
         self.listWidget = QtWidgets.QListWidget(Columns)
         self.listWidget.setGeometry(QtCore.QRect(10, 70, 261, 541))
         self.listWidget.setAlternatingRowColors(True)

@@ -5,7 +5,7 @@ import Launcher
 
 class ColumnFilter(object):
 
-    def setupdata(self,data,info,obj):
+    def setupdata(self,data,info,obj,writer):
         self.label.setText("Table: "+info)
          #get header list -- hardcoded
         self.tableWidget.setRowCount(len(data))
@@ -29,7 +29,8 @@ class ColumnFilter(object):
             rowcount=rowcount+1 
                     
         self.toolButton.clicked.connect(lambda:obj.Data(info, 'and',self.tableWidget)) #'OR' will be coming from GUI soon
-        self.toolButton_2.clicked.connect(obj.Text)
+        #self.toolButton_2.clicked.connect(obj.Text)
+        self.toolButton_2.clicked.connect(lambda:writer.CBDict("Found "+str(len(data))+". "+info, data))
 
     def data(self,item):
         print(item)
@@ -38,6 +39,7 @@ class ColumnFilter(object):
     def setupUi(self, Form):
         Form.setObjectName("Form")
         Form.resize(556, 505)
+        Form.setFixedSize(556, 505) 
         self.label = QtWidgets.QLabel(Form)
         self.label.setGeometry(QtCore.QRect(10, 10, 201, 16))
         font = QtGui.QFont()

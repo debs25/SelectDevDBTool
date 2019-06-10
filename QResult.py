@@ -4,7 +4,7 @@ from PyQt5 import QtCore, QtGui, QtWidgets
 
 class QResultDlg(object):
     
-    def setupdata(self,data,tname,obj):
+    def setupdata(self,data,tname,obj,qstr,writer):
         #self.label.setText("Table: "+tname)
         self.tableWidget.setRowCount(len(data))
         
@@ -21,12 +21,14 @@ class QResultDlg(object):
                 itemcount = itemcount+1
             rowcount=rowcount+1 
                     
-        self.toolButton.clicked.connect(obj.Text)
+        self.toolButton.clicked.connect(lambda:writer.CBDict('Query: '+qstr, data))
+
 
 
     def setupUi(self, Form):
         Form.setObjectName("Form")
-        Form.resize(1289, 334)
+        Form.resize(1300, 330)
+        Form.setFixedSize(1300, 330) 
         self.tableWidget = QtWidgets.QTableWidget(Form)
         self.tableWidget.setGeometry(QtCore.QRect(10, 70, 1271, 251))
         self.tableWidget.setAlternatingRowColors(True)

@@ -7,11 +7,83 @@ import TableList as tableNameList
 import ColumnFilter as columnFilter
 import QResult as resTable
 
+class TextHandler:
+    loggerFile = None
+    def addFile(self):
+        self.loggerFile = open("Data/DBDev_"+TextHandler.GetFileName()+".log","w") 
+        self.loggerFile.write("This is Python Learning Project. Created by deb S. \n")
+        self.loggerFile.write("Created at: "+TextHandler.GetTime())
+        self.loggerFile.flush()
+
+    @classmethod
+    def GetFileName(cls)->str:
+        curtime = f'{datetime.now():%Y%m%d%H%M%S}'
+        return curtime
+
+    @classmethod
+    def GetTime(cls)->str:
+        curtime = f'{datetime.now():%Y-%m-%d %H:%M:%S%z}'
+        #curtime+='\n'
+        return curtime
+
+    def AddList(self, list):
+        #self.loggerFile.write(TextHandler.GetTime()+'\n')
+        self.loggerFile.writelines(map(lambda s:'\t'+ s + '\n', list))
+        self.loggerFile.flush()
+
+    def AddLine(self, line, underline):
+        self.loggerFile.write('['+TextHandler.GetTime()+'] ')
+        self.loggerFile.write(line+'\n')
+        if underline :
+            self.loggerFile.write('-'*(len(line)+20))
+            self.loggerFile.write('\n')
+        self.loggerFile.flush()
+    
+    def CBList(self,line,list):
+        self.AddLine(line,True)
+        self.AddList(list)
+
+    def AddDict(self,dictlist):
+        print(dictlist)
+        if len(dictlist) == 0:
+            self.loggerFile.write("No Data found in output.\n")
+        else:
+            rowcount = 0
+            namestr =""
+            for header in dictlist[0].keys():
+                namestr+='{:20s}'.format('\t'+header+' ')
+            self.loggerFile.write(namestr+'\n')
+            self.loggerFile.write('-' * len(namestr)+'\n')
+            self.loggerFile.flush()
+            table =[]
+            for row in dictlist:
+                itemcount = 0
+                rowstr =""
+                for item in row.values():
+                    rowstr +='{:20s}'.format( str(item)+' ')
+                    itemcount = itemcount+1
+                table.append(rowstr)
+                rowcount=rowcount+1 
+            self.loggerFile.writelines(map(lambda s:'\t'+ s + '\n', table))      
+        self.loggerFile.flush()
+
+    def CBDict(self,line,dict):
+        self.AddLine(line,True)
+        self.AddDict(dict)
+
+    def DontSave(self):
+        pass
+
+    def Close(self):
+        if not self.loggerFile.closed():
+            self.loggerFile.close()
 
 
 class MainUI(object):
+    writer = None
     isConnected = False
     filterdata ={}
+
     def connectDB(self):
         if self.isConnected is False:
             self.con = Con.DB(self.editHost.text(),self.editPort.text(),self.editSID.text(),self.editUser.text(),self.editPassword.text())
@@ -25,12 +97,14 @@ class MainUI(object):
             self.pushSearch.setEnabled(True)
             for edit in editfields:
                 edit.setEnabled(False)
+            self.writer.AddLine('Connected to '+self.con.Version(),False)
         else:
             self.pushSearch.setEnabled(False)
             self.btnConnect.setText("Connect")
             for edit in editfields:
                 edit.setEnabled(True)
-           
+            self.writer.AddLine('DB Disconnected',False)
+
     def Search(self):
         if self.isConnected is True:
             searchstr = self.lineEditSearch.text()
@@ -40,11 +114,11 @@ class MainUI(object):
             self.colui = QtWidgets.QWidget()
             resdiag.setupUi(self.colui)
             if self.checkBoxAsColumn.isChecked() is True:
-                info="Showing all Tables with column "+searchstr
-                resdiag.setupdata(self.con.TablesWithColumnName(owner,searchstr),info,self)
+                info="Showing all Tables with column Name: "+searchstr
+                resdiag.setupdata(self.con.TablesWithColumnName(owner,searchstr),info,self,self.writer)
             else:
-                info="Showing all Tables with containing "+searchstr
-                resdiag.setupdata(self.con.TablesSearch(owner,searchstr),info,self)
+                info="Showing all Tables with containing : "+searchstr
+                resdiag.setupdata(self.con.TablesSearch(owner,searchstr),info,self,self.writer)
                 
             self.colui.show()
             self.colDlg.append(self.colui)
@@ -58,7 +132,7 @@ class MainUI(object):
                 coldiag = columnFilter.ColumnFilter()
                 self.descui = QtWidgets.QWidget()
                 coldiag.setupUi(self.descui)
-                coldiag.setupdata(data,tablename,self)
+                coldiag.setupdata(data,tablename,self,self.writer)
                 self.descui.show()
                 self.tblDlg.append(self.descui)
             
@@ -91,28 +165,25 @@ class MainUI(object):
         #query +=" ;" #lol does not take ; wasted  day :-)
         print(query)
         data = self.con.Query(query)
-        print(data)
         diag = resTable.QResultDlg()
         self.resUI = QtWidgets.QWidget()
         diag.setupUi(self.resUI)
         # add data
-        diag.setupdata(data,tablename,self)
-
+        diag.setupdata(data,tablename,self,query,self.writer)
         self.resUI.show()
         self.colResUI.append(self.resUI)
+
 
         
  
 
-    def ShowRes(self, data):
-        print(self,data)
+    # def ShowRes(self, data):
+    #     print(self,data)
 
-    def SelectQuery(self,data):
-        print(data)
+    # def SelectQuery(self,data):
+    #     print(data)
         
     def UniqueValues(self, column,table)->[str]:
-       # print(column)
-        #print(table)
         return self.con.GetDistValue(column,table)
 
     def setupUi(self, DBGGUMain):
@@ -123,6 +194,8 @@ class MainUI(object):
         self.colDlg = []
         self.tblDlg = []
         self.colResUI = []
+        self.writer = TextHandler()
+        self.writer.addFile()
         sizePolicy = QtWidgets.QSizePolicy(QtWidgets.QSizePolicy.Fixed, QtWidgets.QSizePolicy.Fixed)
         sizePolicy.setHorizontalStretch(0)
         sizePolicy.setVerticalStretch(0)
@@ -202,15 +275,15 @@ class MainUI(object):
         self.statusbar.setObjectName("statusbar")
         DBGGUMain.setStatusBar(self.statusbar)
 
-        #read a config file 
+        #read a config file maybe 
 
         self.editHost.setText("localhost")
-        self.editPassword.setText("go")
+        self.editPassword.setText("debs")
         self.editPort.setText("1521")
         self.editSID.setText("O12CR201")
-        self.editUser.setText("go")
+        self.editUser.setText("debs")
+        self.lineEditSearch.setText("job")
 
-        self.lineEditSearch.setText("MFGSKU")
 
         self.pushSearch.setEnabled(False)
         #connect to buttons 
