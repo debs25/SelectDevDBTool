@@ -1,0 +1,21 @@
+//create user 
+
+// load data from : https://download.oracle.com/oll/tutorials/DBXETutorial/html/module2/les02_load_data_sql.htm
+
+
+        #read a config file maybe 
+
+        self.editHost.setText("localhost")
+        self.editPassword.setText("debs")
+        self.editPort.setText("1521")
+        self.editSID.setText("O12CR201")
+        self.editUser.setText("debs")
+        self.lineEditSearch.setText("job")
+
+        #JDA
+        # self.editHost.setText("localhost")
+        # self.editPassword.setText("go")
+        # self.editPort.setText("1521")
+        # self.editSID.setText("O12CR201")
+        # self.editUser.setText("go")
+        # self.lineEditSearch.setText("MFGSKU")

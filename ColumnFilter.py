@@ -29,7 +29,6 @@ class ColumnFilter(object):
             rowcount=rowcount+1 
                     
         self.toolButton.clicked.connect(lambda:obj.Data(info, 'and',self.tableWidget)) #'OR' will be coming from GUI soon
-        #self.toolButton_2.clicked.connect(obj.Text)
         self.toolButton_2.clicked.connect(lambda:writer.CBDict("Found "+str(len(data))+". "+info, data))
 
     def data(self,item):

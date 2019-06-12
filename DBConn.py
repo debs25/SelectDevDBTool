@@ -71,7 +71,14 @@ class DB:
         #print(res)
         return res
  
-        
+    def GetAllColumns(self, table)-> List[dict]:
+        query = ''' select COLUMN_NAME , data_type , data_length  from ALL_TAB_COLUMNS where upper(TABLE_NAME)=upper(:1) and upper(data_type) in ( upper('varchar2'), upper('varchar')) '''
+        self.cursor.execute(query,  (table,))
+        colnames = list(map(lambda x: x, [d[0] for d in self.cursor.description]))
+        rows = self.cursor.fetchall()
+        result = [dict(zip(colnames, row)) for row in rows]
+        return result
+
     def GetAllColumnsForTable(self, table)-> List[dict]:
         query = ''' select COLUMN_NAME as "Column Name" , data_type as "Data Type", data_length  as "Max Length"  from ALL_TAB_COLUMNS where upper(TABLE_NAME)=upper(:1) '''
         self.cursor.execute(query,  (table,))

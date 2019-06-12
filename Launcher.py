@@ -1,4 +1,5 @@
 # DebS 
+#https://github.com/debs25/SelectDevDBTool
 
 from PyQt5 import QtCore, QtGui, QtWidgets
 from datetime import datetime
@@ -44,7 +45,7 @@ class TextHandler:
         self.AddList(list)
 
     def AddDict(self,dictlist):
-        print(dictlist)
+
         if len(dictlist) == 0:
             self.loggerFile.write("No Data found in output.\n")
         else:
@@ -110,18 +111,52 @@ class MainUI(object):
             searchstr = self.lineEditSearch.text()
             owner = self.editUser.text()
             
-            resdiag = tableNameList.TableList()
-            self.colui = QtWidgets.QWidget()
-            resdiag.setupUi(self.colui)
+            
             if self.checkBoxAsColumn.isChecked() is True:
+                resdiag = tableNameList.TableList()
+                self.colui = QtWidgets.QWidget()
+                resdiag.setupUi(self.colui)
                 info="Showing all Tables with column Name: "+searchstr
                 resdiag.setupdata(self.con.TablesWithColumnName(owner,searchstr),info,self,self.writer)
+                self.colui.setWindowTitle(searchstr+':Containing Tables')
+                self.colui.show()
+                self.colDlg.append(self.colui)
+            elif self.checkBoxFullString.isChecked() is True:
+                tablelist = self.con.TablesSearch(owner,'')
+                tData = []
+                query = ''
+                for table in tablelist:
+                    columns = self.con.GetAllColumns(table)
+                    for column in columns:
+                        query = 'select * from '+ table+ ' where upper('+column['COLUMN_NAME']+')  like  upper(\'%'+searchstr+'%\') '
+                        data = self.con.Query(query)
+                        if len(data) > 0:
+                            tDict = {}
+                            tDict["Table Name"]=table
+                            tDict["Column"]=column['COLUMN_NAME']
+                            tDict["Records Found"]=len(data)
+                            tData.append(tDict)
+
+                diag = resTable.QResultDlg()
+                self.resUI = QtWidgets.QWidget()
+                diag.setupUi(self.resUI)
+                # add data
+                diag.setupdata(tData,'',self,query,self.writer)
+                self.resUI.setWindowTitle('Tables with data:'+searchstr)
+                self.resUI.show()
+                self.colResUI.append(self.resUI)
+                                
             else:
+                resdiag = tableNameList.TableList()
+                self.colui = QtWidgets.QWidget()
+                resdiag.setupUi(self.colui)
                 info="Showing all Tables with containing : "+searchstr
                 resdiag.setupdata(self.con.TablesSearch(owner,searchstr),info,self,self.writer)
+                self.colui.setWindowTitle(searchstr+':Tables Search')
+                self.colui.show()
+                self.colDlg.append(self.colui)
                 
-            self.colui.show()
-            self.colDlg.append(self.colui)
+            
         
          
     def TableItemClicked(self,item):
@@ -133,6 +168,7 @@ class MainUI(object):
                 self.descui = QtWidgets.QWidget()
                 coldiag.setupUi(self.descui)
                 coldiag.setupdata(data,tablename,self,self.writer)
+                self.descui.setWindowTitle(tablename+':Desc')
                 self.descui.show()
                 self.tblDlg.append(self.descui)
             
@@ -154,7 +190,7 @@ class MainUI(object):
                      condlist.append(" "+colname+" = "+colvalue+" ")
                 else :
                     condlist.append(" "+colname+" = '"+colvalue+"' ")
-               # print(colname+':'+colvalue)
+
         if len(condlist) > 0:
             query += " where"
         for i in range(len(condlist)):
@@ -163,25 +199,18 @@ class MainUI(object):
             query += condlist[i]
             
         #query +=" ;" #lol does not take ; wasted  day :-)
-        print(query)
         data = self.con.Query(query)
         diag = resTable.QResultDlg()
         self.resUI = QtWidgets.QWidget()
         diag.setupUi(self.resUI)
         # add data
         diag.setupdata(data,tablename,self,query,self.writer)
+        self.resUI.setWindowTitle(tablename+':Data')
         self.resUI.show()
         self.colResUI.append(self.resUI)
 
 
-        
- 
 
-    # def ShowRes(self, data):
-    #     print(self,data)
-
-    # def SelectQuery(self,data):
-    #     print(data)
         
     def UniqueValues(self, column,table)->[str]:
         return self.con.GetDistValue(column,table)
@@ -298,8 +327,8 @@ class MainUI(object):
         _translate = QtCore.QCoreApplication.translate
         DBGGUMain.setWindowTitle(_translate("DBGGUMain", "pyDB"))
         self.lineEditSearch.setPlaceholderText(_translate("DBGGUMain", "Search with Table / Column"))
-        self.checkBoxAsColumn.setText(_translate("DBGGUMain", "Is Column"))
-        self.checkBoxFullString.setText(_translate("DBGGUMain", "Partial"))
+        self.checkBoxAsColumn.setText(_translate("DBGGUMain", "Column"))
+        self.checkBoxFullString.setText(_translate("DBGGUMain", "Data"))
         self.pushSearch.setText(_translate("DBGGUMain", "Search"))
         self.checkTextFileption.setText(_translate("DBGGUMain", "Single Text File"))
         self.label_5.setText(_translate("DBGGUMain", "Host"))
