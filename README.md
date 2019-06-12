@@ -1,6 +1,16 @@
-## SelectDevDBTool
+## SelectDevDBTool - Simple DB Tool with oracle (cx_oracle) & pyQt5
 making simple db application for windows as python ongoing learning 
 windoes based - super simple tool for developers. Written in python 3. , cx_oracle & pyqt5
+### Usages 
+#### 1. Find Database Tables who's name is like '%TABLE_NAME%' (uncheck 'Data', uncheck 'Column')
+#### 2. Find All Database Tables which has columne named 'COLUMN_NAME' (uncheck 'Data', check 'Column')
+#### 3. Search any value through out the tables (check 'Data', uncheck 'Column')
+#### 4. Get Table Columns , Data Type, Unique Data inside Combobox , select (no write) any value to filter.
+#### 5. View Filtered Data in multiple table in multiple window. Close Any window anytime.
+#### 6. All search, table description can be saved with a button click for later usages.
+#### 7. Find out how qtpy5 tableWidget, listWidget, combobox used to make this app - suggest better ways 
+
+###### unorganized code , but app works - will clearn , modify soon 
 
 Guide :
 install cx_oracle, pyQt5.
@@ -39,5 +49,5 @@ install cx_oracle, pyQt5.
 ![save your research in table jungle](https://user-images.githubusercontent.com/16148918/59210379-1943b380-8bcb-11e9-802f-63af255015b2.PNG)
 
 
-### 10. What next? - learning python - so should try to integrate NLP , dont like  query langauage :-( 
-### will share here :-)  
+### 10. What next? will should try to integrate NLP , dont like  query langauage :-( 
+
